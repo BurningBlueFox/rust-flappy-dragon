@@ -22,10 +22,14 @@ impl State {
         ctx.print_centered(8, "(P) play the game");
         ctx.print_centered(9, "(Q) quit the game");
 
+        self.print_debug_info(ctx);
+
         self.handle_menu_input(ctx);
     }
 
     fn play(&mut self, ctx: &mut BTerm) {
+        self.print_debug_info(ctx);
+
         self.mode = GameMode::End;
     }
 
@@ -34,6 +38,8 @@ impl State {
         ctx.print_centered(5, "Game Over");
         ctx.print_centered(8, "(P) play again");
         ctx.print_centered(9, "(Q) quit the game");
+
+        self.print_debug_info(ctx);
 
         self.handle_menu_input(ctx);
     }
@@ -50,6 +56,11 @@ impl State {
                 _ => {}
             }
         }
+    }
+
+    fn print_debug_info(&mut self, ctx: &mut BTerm) {
+        ctx.print(2, 2, format!("FPS: {}", ctx.fps));
+        ctx.print(2, 3, format!("Frame time: {}", ctx.frame_time_ms));
     }
 }
 
