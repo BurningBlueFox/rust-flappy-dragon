@@ -8,5 +8,5 @@ fn main() -> BError {
         .with_title("Flappy Dragon")
         .build()?;
 
-        main_loop(context, State::new())
+    main_loop(context, State::new())
 }

@@ -1,4 +1,11 @@
+mod entities;
+
 use bracket_lib::prelude::*;
+use entities::*;
+
+const SCREEN_WIDTH: i32 = 80;
+const SCREEN_HEIGHT: i32 = 50;
+const FRAME_DURATION: f32 = 75.0;
 
 pub enum GameMode {
     Menu,
@@ -7,12 +14,16 @@ pub enum GameMode {
 }
 pub struct State {
     mode: GameMode,
+    player: Player,
+    frame_time: f32,
 }
 
 impl State {
     pub fn new() -> Self {
         State {
             mode: GameMode::Menu,
+            player: Player::new(5, 25),
+            frame_time: 0.0,
         }
     }
 
@@ -30,7 +41,25 @@ impl State {
     fn play(&mut self, ctx: &mut BTerm) {
         self.print_debug_info(ctx);
 
-        self.mode = GameMode::End;
+        ctx.cls_bg(NAVY);
+        self.frame_time += ctx.frame_time_ms;
+
+        if self.frame_time > FRAME_DURATION{
+            self.frame_time = 0.0;
+            self.player.process_movement();
+        }
+
+        if let Some(VirtualKeyCode::Space) = ctx.key {
+            self.player.flap();
+        }
+
+        self.player.render(ctx);
+
+        ctx.print(0, 0, "press SPACEBAR to flap");
+
+        if self.player.transform.pos_y > SCREEN_HEIGHT{
+            self.mode = GameMode::End;
+        }
     }
 
     fn dead(&mut self, ctx: &mut BTerm) {
@@ -46,6 +75,8 @@ impl State {
 
     fn restart(&mut self) {
         self.mode = GameMode::Playing;
+        self.frame_time = 0.0;
+        self.player = Player::new(5, 25);
     }
 
     fn handle_menu_input(&mut self, ctx: &mut BTerm) {
